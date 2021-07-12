@@ -182,7 +182,7 @@ namespace System.Management.Automation
             }
         }
 
-        private List<string> _argumentList = new List<string>();
+        private readonly List<string> _argumentList = new List<string>();
 
         /// <summary>
         /// Gets a value indicating whether to use an ArgumentList or string for arguments when invoking a native executable.
@@ -466,7 +466,7 @@ namespace System.Management.Automation
                     {
                         ProviderInfo fileSystemProvider = context.EngineSessionState.GetSingleProvider(FileSystemProvider.ProviderName);
                         return new StringBuilder(fileSystemProvider.Home)
-                            .Append(path.Substring(1))
+                            .Append(path.AsSpan(1))
                             .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)
                             .ToString();
                     }
