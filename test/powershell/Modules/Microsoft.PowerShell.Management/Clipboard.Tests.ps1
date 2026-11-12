@@ -36,6 +36,13 @@ Describe 'Clipboard cmdlet tests' -Tag CI {
             Get-Clipboard -Raw | Should -BeExactly "1$([Environment]::NewLine)2"
         }
 
+        It 'Get-Clipboard -Delimiter should return items based on the delimiter' {
+            Set-Clipboard -Value "Line1`r`nLine2`nLine3"
+            $result = Get-Clipboard -Delimiter "`r`n", "`n"
+            $result.Count | Should -Be 3
+            $result | ForEach-Object -Process {$_.Length | Should -Be "LineX".Length}
+        }
+
         It 'Set-Clipboard -Append will add text' {
             'hello' | Set-Clipboard
             'world' | Set-Clipboard -Append
@@ -50,6 +57,37 @@ Describe 'Clipboard cmdlet tests' -Tag CI {
 
             $text | Set-Clipboard
             Get-Clipboard -Raw | Should -BeNullOrEmpty
+        }
+
+        It 'Set-Clipboard should not return object' {
+            $result = 'hello' | Set-Clipboard
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'Set-Clipboard -PassThru returns single object with -Append = <Append>' -TestCases @(
+            @{ Append = $false }
+            @{ Append = $true }
+        ){
+            param ($append)
+
+            $params = @{ PassThru = $true; Append = $append }
+
+            Set-Clipboard -Value 'world'
+            $result = 'hello' | Set-Clipboard @params
+            $result | Should -BeExactly 'hello'
+        }
+
+        It 'Set-Clipboard -PassThru returns multiple objects with -Append = <Append>' -TestCases @(
+            @{ Append = $false }
+            @{ Append = $true }
+        ){
+            param ($append)
+
+            $params = @{ PassThru = $true; Append = $append }
+
+            Set-Clipboard -Value 'world'
+            $result = 'hello', 'world' | Set-Clipboard @params
+            $result | Should -BeExactly @('hello', 'world')
         }
     }
 }

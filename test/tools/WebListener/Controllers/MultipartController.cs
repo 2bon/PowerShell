@@ -18,7 +18,7 @@ namespace mvc.Controllers
 {
     public class MultipartController : Controller
     {
-        private IWebHostEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
         public MultipartController(IWebHostEnvironment environment)
         {
@@ -75,7 +75,7 @@ namespace mvc.Controllers
             Hashtable headers = new Hashtable();
             foreach (var key in Request.Headers.Keys)
             {
-                headers.Add(key, string.Join(Constants.HeaderSeparator, Request.Headers[key]));
+                headers.Add(key, string.Join(Constants.HeaderSeparator, (string)Request.Headers[key]));
             }
 
             Hashtable output = new Hashtable

@@ -111,11 +111,8 @@ namespace System.Management.Automation.Language
             TypeLookupResult result;
             if (_typeTable.TryGetValue(typeDefinitionAst.Name, out result))
             {
-                if (result.ExternalNamespaces != null)
-                {
-                    // override external type by the type defined in the current namespace
-                    result.ExternalNamespaces.Add(moduleInfo.Name);
-                }
+                // override external type by the type defined in the current namespace
+                result.ExternalNamespaces?.Add(moduleInfo.Name);
             }
             else
             {
@@ -275,7 +272,7 @@ namespace System.Management.Automation.Language
         }
     }
 
-    internal class SymbolResolver : AstVisitor2, IAstPostVisitHandler
+    internal sealed class SymbolResolver : AstVisitor2, IAstPostVisitHandler
     {
         private readonly SymbolResolvePostActionVisitor _symbolResolvePostActionVisitor;
         internal readonly SymbolTable _symbolTable;
@@ -407,7 +404,7 @@ namespace System.Management.Automation.Language
                                 var typeAst = _symbolTable.GetCurrentTypeDefinitionAst();
                                 Diagnostics.Assert(typeAst != null, "Method scopes can exist only inside type definitions.");
 
-                                string typeString = string.Format(CultureInfo.InvariantCulture, "[{0}]::", typeAst.Name);
+                                string typeString = string.Create(CultureInfo.InvariantCulture, $"[{typeAst.Name}]::");
                                 _parser.ReportError(variableExpressionAst.Extent,
                                     nameof(ParserStrings.MissingTypeInStaticPropertyAssignment),
                                     ParserStrings.MissingTypeInStaticPropertyAssignment,
